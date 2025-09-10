@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, HttpStatus, HttpException, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { DeliveryPersonService } from './deliveryPerson.service';
-import { PaginationDto } from 'src/common/pagination/pagination.dto';
+import { PaginationDto } from '../common/pagination/pagination.dto';
 import { CreateDeliveryPerson } from './dto/CreateDeliveryPerson.dto';
 import { UpdateLocationDeliveryPerson } from './dto/UpdateLocationDeliveryPerson.dto';
 import { UpdateStatusDeliveryPerson } from './dto/UpdateStatusDeliveryPerson.dto';
