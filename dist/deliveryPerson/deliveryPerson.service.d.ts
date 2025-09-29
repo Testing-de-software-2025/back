@@ -1,8 +1,8 @@
 import { Repository } from 'typeorm';
 import { DeliveryPersonEntity, DeliveryPersonStatus } from './deliveryPerson.entity';
-import { Zone } from 'src/zone/zone.entity';
+import { Zone } from '../zone/zone.entity';
 import { ZoneService } from '../zone/zone.service';
-import { PaginationDto } from 'src/common/pagination/pagination.dto';
+import { PaginationDto } from '../common/pagination/pagination.dto';
 import { CreateDeliveryPerson } from './dto/CreateDeliveryPerson.dto';
 import { UpdateLocationDeliveryPerson } from './dto/UpdateLocationDeliveryPerson.dto';
 import { UpdateStatusDeliveryPerson } from './dto/UpdateStatusDeliveryPerson.dto';
