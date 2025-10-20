@@ -1,14 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { DeliveryPersonService } from './deliveryPerson.service';
-import { DeliveryPersonEntity, DeliveryPersonStatus } from './deliveryPerson.entity';
-import { Repository } from 'typeorm';
-import { ZoneService } from '../zone/zone.service';
-import { Zone } from '../zone/zone.entity';
+import { Test, TestingModule } from "@nestjs/testing";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { DeliveryPersonService } from "./deliveryPerson.service";
+import {
+  DeliveryPersonEntity,
+  DeliveryPersonStatus,
+} from "./deliveryPerson.entity";
+import { Repository } from "typeorm";
+import { ZoneService } from "../zone/zone.service";
+import { Zone } from "../zone/zone.entity";
 
-describe('DeliveryPersonService (unit)', () => {
+describe("DeliveryPersonService (unit)", () => {
   let service: DeliveryPersonService;
-  let repo: Partial<Record<string, jest.Mock>> & { manager: { getRepository: jest.Mock } };
+  let repo: Partial<Record<string, jest.Mock>> & {
+    manager: { getRepository: jest.Mock };
+  };
   let zoneServiceMock: Partial<Record<string, jest.Mock>>;
 
   beforeEach(async () => {
@@ -45,8 +50,8 @@ describe('DeliveryPersonService (unit)', () => {
     jest.resetAllMocks();
   });
 
-  it('create() -> debe crear y devolver repartidor', async () => {
-    const dto = { name: 'Juan', location: { lat: 0, lng: 0 } };
+  it("create() -> debe crear y devolver repartidor", async () => {
+    const dto = { name: "Juan", location: { lat: 0, lng: 0 } };
     const created = { ...dto };
     const saved = { id: 1, ...dto };
 
@@ -58,7 +63,7 @@ describe('DeliveryPersonService (unit)', () => {
     expect(repo.save).toHaveBeenCalledWith(created);
   });
 
-  it('findAll() -> debe retornar array y total', async () => {
+  it("findAll() -> debe retornar array y total", async () => {
     const deliveries = [{ id: 1 }, { id: 2 }];
     (repo.findAndCount as jest.Mock).mockResolvedValue([deliveries, 2]);
 
@@ -67,15 +72,18 @@ describe('DeliveryPersonService (unit)', () => {
     expect(repo.findAndCount).toHaveBeenCalled();
   });
 
-  it('findById() -> debe devolver el repartidor', async () => {
-    const entity = { id: 1, name: 'Juan' };
+  it("findById() -> debe devolver el repartidor", async () => {
+    const entity = { id: 1, name: "Juan" };
     (repo.findOneOrFail as jest.Mock).mockResolvedValue(entity);
 
-  await expect(service.findById(1)).resolves.toEqual(entity);
-  expect(repo.findOneOrFail).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['zones'] as any });
+    await expect(service.findById(1)).resolves.toEqual(entity);
+    expect(repo.findOneOrFail).toHaveBeenCalledWith({
+      where: { id: 1 },
+      relations: ["zones"] as any,
+    });
   });
 
-  it('assignZone() -> asigna zonas cuando existe repartidor', async () => {
+  it("assignZone() -> asigna zonas cuando existe repartidor", async () => {
     const id = 1;
     const assignDto = { zoneIds: [10, 20] };
     const deliveryPerson = { id, zones: [] };
@@ -84,33 +92,47 @@ describe('DeliveryPersonService (unit)', () => {
     (zoneServiceMock.findManyByIds as jest.Mock).mockResolvedValue(zones);
     (repo.save as jest.Mock).mockResolvedValue({ id, zones });
 
-    await expect(service.assignZone(id, assignDto as any)).resolves.toEqual({ id, zones });
-    expect(repo.findOne).toHaveBeenCalledWith({ where: { id }, relations: ['zones'] });
-    expect(zoneServiceMock.findManyByIds).toHaveBeenCalledWith(assignDto.zoneIds);
+    await expect(service.assignZone(id, assignDto as any)).resolves.toEqual({
+      id,
+      zones,
+    });
+    expect(repo.findOne).toHaveBeenCalledWith({
+      where: { id },
+      relations: ["zones"],
+    });
+    expect(zoneServiceMock.findManyByIds).toHaveBeenCalledWith(
+      assignDto.zoneIds,
+    );
     expect(repo.save).toHaveBeenCalled();
   });
 
-  it('assignZone() -> retorna null si no existe repartidor', async () => {
+  it("assignZone() -> retorna null si no existe repartidor", async () => {
     (repo.findOne as jest.Mock).mockResolvedValue(null);
     const res = await service.assignZone(999, { zoneIds: [1] } as any);
     expect(res).toBeNull();
   });
 
-  it('getZonesAssigned() -> devuelve zonas si existe', async () => {
+  it("getZonesAssigned() -> devuelve zonas si existe", async () => {
     const dp = { id: 1, zones: [{ id: 5 }] };
     (repo.findOne as jest.Mock).mockResolvedValue(dp);
 
     await expect(service.getZonesAssigned(1)).resolves.toEqual(dp.zones);
   });
 
-  it('unassignZone() -> quita una zona y guarda', async () => {
-    const dp = { id: 1, zones: [{ id: 1 }, { id: 2 }], location: { lat: 0, lng: 0 } };
+  it("unassignZone() -> quita una zona y guarda", async () => {
+    const dp = {
+      id: 1,
+      zones: [{ id: 1 }, { id: 2 }],
+      location: { lat: 0, lng: 0 },
+    };
     const zoneToRemove = { id: 2 };
     (repo.findOneOrFail as jest.Mock).mockResolvedValue(dp);
 
     // mock manager.getRepository(Zone).findOneOrFail
-    const fakeZoneRepo = { findOneOrFail: jest.fn().mockResolvedValue(zoneToRemove) };
-  (repo.manager.getRepository).mockReturnValue(fakeZoneRepo);
+    const fakeZoneRepo = {
+      findOneOrFail: jest.fn().mockResolvedValue(zoneToRemove),
+    };
+    repo.manager.getRepository.mockReturnValue(fakeZoneRepo);
 
     (repo.save as jest.Mock).mockImplementation((x) => Promise.resolve(x));
 
@@ -118,10 +140,10 @@ describe('DeliveryPersonService (unit)', () => {
     expect(repo.findOneOrFail).toHaveBeenCalled();
     expect(repo.manager.getRepository).toHaveBeenCalledWith(Zone);
     expect(repo.save).toHaveBeenCalled();
-    expect(res.zones.find(z => z.id === 2)).toBeUndefined();
+    expect(res.zones.find((z) => z.id === 2)).toBeUndefined();
   });
 
-  it('unassignAllZones() -> deja el array de zonas vacío', async () => {
+  it("unassignAllZones() -> deja el array de zonas vacío", async () => {
     const dp = { id: 1, zones: [{ id: 1 }] };
     (repo.findOneOrFail as jest.Mock).mockResolvedValue(dp);
     (repo.save as jest.Mock).mockResolvedValue({ ...dp, zones: [] });
@@ -132,7 +154,7 @@ describe('DeliveryPersonService (unit)', () => {
     expect(res.zones).toEqual([]);
   });
 
-  it('findByProximity() -> filtra y ordena por distancia', async () => {
+  it("findByProximity() -> filtra y ordena por distancia", async () => {
     // punto base
     const base = { lat: -31.4, lng: -64.2 };
     const radius = 3000; // km (usar un valor grande para incluir)
@@ -143,12 +165,15 @@ describe('DeliveryPersonService (unit)', () => {
 
     (repo.find as jest.Mock).mockResolvedValue([b, c, a]); // desordenado
 
-    const res = await service.findByProximity({ location: base, radius } as any);
+    const res = await service.findByProximity({
+      location: base,
+      radius,
+    } as any);
     expect(Array.isArray(res)).toBe(true);
     // los que quedaron deben ser a y b (c fuera por lejanía en este ejemplo)
-    expect(res.some(x => x.id === 1)).toBe(true);
+    expect(res.some((x) => x.id === 1)).toBe(true);
     // además deben venir ordenados por distancia (1 antes que 2)
-    const ids = res.map(r => r.id);
+    const ids = res.map((r) => r.id);
     const idx1 = ids.indexOf(1);
     const idx2 = ids.indexOf(2);
     expect(idx1).toBeLessThan(idx2);

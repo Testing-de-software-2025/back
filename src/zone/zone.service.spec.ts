@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ZoneService } from './zone.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Zone } from './zone.entity';
+import { Test, TestingModule } from "@nestjs/testing";
+import { ZoneService } from "./zone.service";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { Zone } from "./zone.entity";
 
-describe('ZoneService (unit)', () => {
+describe("ZoneService (unit)", () => {
   let service: ZoneService;
   const mockRepo = {
     findAndCount: jest.fn(),
@@ -28,8 +28,8 @@ describe('ZoneService (unit)', () => {
     jest.clearAllMocks();
   });
 
-  it('create() -> debe crear y guardar zona', async () => {
-    const dto = { name: 'Centro', radius: 5 };
+  it("create() -> debe crear y guardar zona", async () => {
+    const dto = { name: "Centro", radius: 5 };
     const created = { ...dto };
     const saved = { id: 1, ...dto };
     mockRepo.create.mockReturnValue(created);
@@ -40,7 +40,7 @@ describe('ZoneService (unit)', () => {
     expect(mockRepo.save).toHaveBeenCalledWith(created);
   });
 
-  it('findAll() -> devuelve zonas y total', async () => {
+  it("findAll() -> devuelve zonas y total", async () => {
     const zones = [{ id: 1 }];
     mockRepo.findAndCount.mockResolvedValue([zones, 1]);
     const res = await service.findAll({ limit: 10, offset: 0 } as any);
@@ -48,27 +48,29 @@ describe('ZoneService (unit)', () => {
     expect(mockRepo.findAndCount).toHaveBeenCalled();
   });
 
-  it('findOne() -> devuelve zona', async () => {
-    const z = { id: 1, name: 'A' };
+  it("findOne() -> devuelve zona", async () => {
+    const z = { id: 1, name: "A" };
     mockRepo.findOneOrFail.mockResolvedValue(z);
     await expect(service.findOne(1)).resolves.toEqual(z);
   });
 
-  it('findManyByIds() -> devuelve las zonas pedidas', async () => {
+  it("findManyByIds() -> devuelve las zonas pedidas", async () => {
     const data = [{ id: 1 }, { id: 2 }];
     mockRepo.find.mockResolvedValue(data);
-    await expect(service.findManyByIds([1,2])).resolves.toEqual(data);
+    await expect(service.findManyByIds([1, 2])).resolves.toEqual(data);
     expect(mockRepo.find).toHaveBeenCalled();
   });
 
-  it('update() -> actualiza y devuelve entity', async () => {
+  it("update() -> actualiza y devuelve entity", async () => {
     mockRepo.update.mockResolvedValue(undefined);
-    mockRepo.findOne.mockResolvedValue({ id: 1, name: 'updated' });
-    await expect(service.update(1, { name: 'updated' } as any)).resolves.toEqual({ id: 1, name: 'updated' });
-    expect(mockRepo.update).toHaveBeenCalledWith(1, { name: 'updated' });
+    mockRepo.findOne.mockResolvedValue({ id: 1, name: "updated" });
+    await expect(
+      service.update(1, { name: "updated" } as any),
+    ).resolves.toEqual({ id: 1, name: "updated" });
+    expect(mockRepo.update).toHaveBeenCalledWith(1, { name: "updated" });
   });
 
-  it('remove() -> llama a delete', async () => {
+  it("remove() -> llama a delete", async () => {
     mockRepo.delete.mockResolvedValue(undefined);
     await expect(service.remove(1)).resolves.toBeUndefined();
     expect(mockRepo.delete).toHaveBeenCalledWith(1);
