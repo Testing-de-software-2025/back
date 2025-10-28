@@ -17,6 +17,7 @@ class AssignZoneDeliveryPerson {
 exports.AssignZoneDeliveryPerson = AssignZoneDeliveryPerson;
 __decorate([
     (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
     __metadata("design:type", Array)
 ], AssignZoneDeliveryPerson.prototype, "zoneIds", void 0);
 //# sourceMappingURL=AssignZoneDeliveryPerson.dto.js.map

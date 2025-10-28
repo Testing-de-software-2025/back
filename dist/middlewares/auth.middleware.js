@@ -13,7 +13,6 @@ exports.AuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const axios_1 = require("axios");
-const process = require("node:process");
 const permissions_decorator_1 = require("./decorators/permissions.decorator");
 let AuthGuard = class AuthGuard {
     reflector;
@@ -27,7 +26,9 @@ let AuthGuard = class AuthGuard {
             if (!token) {
                 throw new common_1.UnauthorizedException("No token provided");
             }
-            const permissions = this.reflector.get(permissions_decorator_1.Permissions, context.getHandler());
+            const permissions = this.reflector.get(permissions_decorator_1.PERMISSIONS_KEY, context.getHandler()) ?? [];
+            if (!permissions.length)
+                return true;
             const baseURL = process.env.JWT_SERVICE_URL || "http://localhost:3001";
             const requests = permissions.map((permission) => axios_1.default.get(`${baseURL}/can-do/${permission}`, {
                 headers: {
@@ -36,22 +37,22 @@ let AuthGuard = class AuthGuard {
                 },
             }));
             const results = await Promise.allSettled(requests);
-            const atLeastOneAllowed = results.some((result) => result.status === "fulfilled" && result.value.data);
-            if (atLeastOneAllowed) {
-                return true;
+            for (const r of results) {
+                if (r.status === "fulfilled" && r.value?.data)
+                    return true;
             }
-            else {
-                throw new common_1.ForbiddenException("Insufficient permissions");
-            }
+            throw new common_1.ForbiddenException("Insufficient permissions");
         }
         catch (error) {
             if (error instanceof common_1.UnauthorizedException ||
                 error instanceof common_1.ForbiddenException) {
                 throw error;
             }
-            if (error.isAxiosError && error.response) {
-                const status = error.response.status;
-                const message = error.response.data?.message || error.message;
+            const err = error;
+            if (axios_1.default.isAxiosError(err) && err.response) {
+                const status = err.response.status;
+                const respData = err.response.data;
+                const message = respData?.message ?? err.message;
                 if (status === 401) {
                     throw new common_1.UnauthorizedException(message);
                 }

@@ -1,6 +1,7 @@
 import { ZoneService } from "./zone.service";
 import { Zone } from "./zone.entity";
 import { CreateZone } from "./dto/CreateZone.dto";
+import { UpdateZone } from "./dto/UpdateZone.dto";
 import { UpdatePartialZone } from "./dto/UpdatePartialZone.dto";
 import { PaginationDto } from "../common/pagination/pagination.dto";
 export declare class ZoneController {
@@ -12,7 +13,7 @@ export declare class ZoneController {
     }>;
     create(createZone: CreateZone): Promise<Zone>;
     findOne(id: string): Promise<Zone>;
-    update(id: string, UpdateZoneDto: CreateZone): Promise<Zone>;
+    update(id: string, updateZoneDto: UpdateZone): Promise<Zone>;
     updatePartial(id: string, updateZoneDto: UpdatePartialZone): Promise<Zone>;
     remove(id: string): Promise<{
         message: string;

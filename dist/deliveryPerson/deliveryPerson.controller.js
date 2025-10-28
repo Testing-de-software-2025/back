@@ -34,7 +34,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return await this.deliveryPersonService.create(CreateDeliveryPerson);
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.BAD_REQUEST);
+            const message = error instanceof Error ? error.message : "Bad request";
+            throw new common_1.HttpException(message, common_1.HttpStatus.BAD_REQUEST);
         }
     }
     async findall(paginationDto) {
@@ -42,7 +43,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return await this.deliveryPersonService.findAll(paginationDto);
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async findOne(id) {
@@ -50,7 +52,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return await this.deliveryPersonService.findById(id);
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.NOT_FOUND);
+            const message = error instanceof Error ? error.message : "Not found";
+            throw new common_1.HttpException(message, common_1.HttpStatus.NOT_FOUND);
         }
     }
     async updateLocation(id, updateLocationDto) {
@@ -62,7 +65,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return deliveryPerson;
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async updateStatus(id, updateStatusDto) {
@@ -74,7 +78,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return deliveryPerson;
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async findByProximity(findByProximityDto) {
@@ -82,7 +87,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return await this.deliveryPersonService.findByProximity(findByProximityDto);
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async findByZone(FindByZone) {
@@ -90,7 +96,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return await this.deliveryPersonService.findByZone(FindByZone);
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async assignZone(id, assignZoneDto) {
@@ -102,7 +109,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return deliveryPerson;
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async getZonesAssigned(id) {
@@ -114,7 +122,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return zones;
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async removeZone(id, zoneId) {
@@ -123,7 +132,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return { message: "Zone removed from delivery" };
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async remove(id) {
@@ -132,7 +142,8 @@ let DeliveryPersonController = class DeliveryPersonController {
             return { message: "Delivery deleted" };
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

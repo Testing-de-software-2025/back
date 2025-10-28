@@ -13,13 +13,13 @@ let TypeOrmExceptionFilter = class TypeOrmExceptionFilter {
     catch(exception, host) {
         const ctx = host.switchToHttp();
         const res = ctx.getResponse();
-        const error = exception;
         const status = common_1.HttpStatus.BAD_REQUEST;
-        const message = "Error en la base de datos";
+        const message = exception.message ||
+            "Error en la base de datos";
         res.status(status).json({
             statusCode: status,
             message,
-            error: common_1.HttpStatus[status].toString(),
+            error: common_1.HttpStatus[status],
         });
     }
 };

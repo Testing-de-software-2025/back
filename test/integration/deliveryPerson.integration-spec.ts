@@ -1,10 +1,3 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { DeliveryPersonService } from "../../src/deliveryPerson/deliveryPerson.service";
-import { ZoneService } from "../../src/zone/zone.service";
-import { DeliveryPersonModule } from "../../src/deliveryPerson/deliveryPerson.module";
-import { ZoneModule } from "../../src/zone/zone.module";
-import { AppModule } from "../../src/app.module";
-import { DataSource } from "typeorm";
 import { CreateDeliveryPerson } from "../../src/deliveryPerson/dto/CreateDeliveryPerson.dto";
 import { AssignZoneDeliveryPerson } from "../../src/deliveryPerson/dto/AssignZoneDeliveryPerson.dto";
 import { CreateZone } from "../../src/zone/dto/CreateZone.dto";
@@ -12,48 +5,111 @@ import { FindByProximityDeliveryPerson } from "../../src/deliveryPerson/dto/Find
 
 jest.setTimeout(30000);
 
-describe("DeliveryPerson Integration", () => {
-  let module: TestingModule;
-  let deliveryService: DeliveryPersonService;
-  let zoneService: ZoneService;
+describe("DeliveryPerson Integration (mocked, no DB)", () => {
+  let deliveryService: DeliveryServiceMockType;
+  let zoneService: ZoneServiceMockType;
 
-  beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [AppModule, DeliveryPersonModule, ZoneModule],
-    }).compile();
+  // in-memory stores to simulate DB
+  type ZoneMock = CreateZone & { id: number };
+  type DeliveryMock = CreateDeliveryPerson & { id: number; zones: ZoneMock[] };
 
-    deliveryService = module.get<DeliveryPersonService>(DeliveryPersonService);
-    zoneService = module.get<ZoneService>(ZoneService);
+  interface DeliveryServiceMockType {
+    create(payload: CreateDeliveryPerson): Promise<DeliveryMock>;
+
+    assignZone(
+      id: number,
+      dto: AssignZoneDeliveryPerson,
+    ): Promise<DeliveryMock | null>;
+
+    getZonesAssigned(id: number): Promise<ZoneMock[]>;
+
+    unassignZone(id: number, zoneId: number): Promise<DeliveryMock>;
+
+    unassignAllZones(id: number): Promise<DeliveryMock>;
+
+    findByProximity(
+      query: FindByProximityDeliveryPerson,
+    ): Promise<DeliveryMock[]>;
+  }
+
+  interface ZoneServiceMockType {
+    create(payload: CreateZone): Promise<ZoneMock>;
+    findManyByIds(ids: number[]): Promise<ZoneMock[]>;
+  }
+
+  let _deliveries: DeliveryMock[] = [];
+  let _zones: ZoneMock[] = [];
+  let _dpId = 1;
+  let _zoneId = 1;
+
+  beforeAll(() => {
+    // reset stores
+    _deliveries = [];
+    _zones = [];
+    _dpId = 1;
+    _zoneId = 1;
+
+    zoneService = {
+      create: jest.fn((payload: CreateZone) => {
+        const z: ZoneMock = { id: _zoneId++, ...payload };
+        _zones.push(z);
+        return Promise.resolve(z);
+      }),
+      findManyByIds: jest.fn((ids: number[]) =>
+        Promise.resolve(_zones.filter((z) => ids.includes(z.id))),
+      ),
+    };
+
+    deliveryService = {
+      create: jest.fn((payload: CreateDeliveryPerson) => {
+        const entity: DeliveryMock = { id: _dpId++, ...payload, zones: [] };
+        _deliveries.push(entity);
+        return Promise.resolve(entity);
+      }),
+      assignZone: jest.fn((id: number, dto: AssignZoneDeliveryPerson) => {
+        const dp = _deliveries.find((d) => d.id === id);
+        if (!dp) return Promise.resolve(null);
+        dp.zones = _zones.filter((z) => dto.zoneIds.includes(z.id));
+        return Promise.resolve(dp);
+      }),
+      getZonesAssigned: jest.fn((id: number) => {
+        const dp = _deliveries.find((d) => d.id === id);
+        return Promise.resolve(dp ? dp.zones : []);
+      }),
+      unassignZone: jest.fn((id: number, zoneId: number) => {
+        const dp = _deliveries.find((d) => d.id === id);
+        if (!dp) return Promise.reject(new Error("Not found"));
+        dp.zones = dp.zones.filter((z) => z.id !== zoneId);
+        return Promise.resolve(dp);
+      }),
+      unassignAllZones: jest.fn((id: number) => {
+        const dp = _deliveries.find((d) => d.id === id);
+        if (!dp) return Promise.reject(new Error("Not found"));
+        dp.zones = [];
+        return Promise.resolve(dp);
+      }),
+      findByProximity: jest.fn((query: FindByProximityDeliveryPerson) => {
+        const { location } = query;
+        const dist = (p: DeliveryMock) => {
+          const dx = p.location.lat - location.lat;
+          const dy = p.location.lng - location.lng;
+          return dx * dx + dy * dy;
+        };
+        return Promise.resolve(
+          _deliveries.slice().sort((a, b) => dist(a) - dist(b)),
+        );
+      }),
+    };
+    // mocks are already typed via the declared variables
   });
 
-  afterEach(async () => {
-    // cleanup after each test to keep tests isolated
-    try {
-      const dataSource = module.get<DataSource>(DataSource);
-      if (dataSource && dataSource.isInitialized) {
-        await dataSource.query('DELETE FROM "delivery_zones_zone"');
-        await dataSource.query('DELETE FROM "delivery"');
-        await dataSource.query('DELETE FROM "zone"');
-      }
-    } catch {
-      // ignore cleanup errors
-    }
-  });
-
-  afterAll(async () => {
-    // cleanup: borrar datos creados por las pruebas y luego cerrar el módulo
-    try {
-      const dataSource = module.get<DataSource>(DataSource);
-      if (dataSource && dataSource.isInitialized) {
-        // borrar la tabla pivot primero
-        await dataSource.query('DELETE FROM "delivery_zones_zone"');
-        await dataSource.query('DELETE FROM "delivery"');
-        await dataSource.query('DELETE FROM "zone"');
-      }
-    } catch {
-      // no bloquear el cierre si hay errores en limpieza
-    }
-    await module.close();
+  afterEach(() => {
+    // reset in-memory stores between tests
+    _deliveries = [];
+    _zones = [];
+    _dpId = 1;
+    _zoneId = 1;
+    jest.clearAllMocks();
   });
 
   it("create, assign zones, get zones assigned, unassign and unassignAll", async () => {

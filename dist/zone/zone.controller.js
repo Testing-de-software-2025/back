@@ -16,6 +16,7 @@ exports.ZoneController = void 0;
 const common_1 = require("@nestjs/common");
 const zone_service_1 = require("./zone.service");
 const CreateZone_dto_1 = require("./dto/CreateZone.dto");
+const UpdateZone_dto_1 = require("./dto/UpdateZone.dto");
 const UpdatePartialZone_dto_1 = require("./dto/UpdatePartialZone.dto");
 const pagination_dto_1 = require("../common/pagination/pagination.dto");
 const auth_middleware_1 = require("../middlewares/auth.middleware");
@@ -40,19 +41,21 @@ let ZoneController = class ZoneController {
             return zone;
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    async update(id, UpdateZoneDto) {
+    async update(id, updateZoneDto) {
         try {
-            const zone = await this.zoneService.update(+id, UpdateZoneDto);
+            const zone = await this.zoneService.update(+id, updateZoneDto);
             if (!zone) {
                 throw new common_1.HttpException("Zone not found", common_1.HttpStatus.NOT_FOUND);
             }
             return zone;
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async updatePartial(id, updateZoneDto) {
@@ -64,7 +67,8 @@ let ZoneController = class ZoneController {
             return zone;
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async remove(id) {
@@ -73,7 +77,8 @@ let ZoneController = class ZoneController {
             return { message: "Zone deleted successfully" };
         }
         catch (error) {
-            throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            const message = error instanceof Error ? error.message : "Internal server error";
+            throw new common_1.HttpException(message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };
@@ -112,7 +117,7 @@ __decorate([
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, CreateZone_dto_1.CreateZone]),
+    __metadata("design:paramtypes", [String, UpdateZone_dto_1.UpdateZone]),
     __metadata("design:returntype", Promise)
 ], ZoneController.prototype, "update", null);
 __decorate([
