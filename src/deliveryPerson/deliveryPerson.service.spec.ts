@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { DeliveryPersonService } from "./deliveryPerson.service";
-import {
-  DeliveryPersonEntity,
-  DeliveryPersonStatus,
-} from "./deliveryPerson.entity";
-import { Repository } from "typeorm";
+import { DeliveryPersonEntity } from "./deliveryPerson.entity";
+import { CreateDeliveryPerson } from "./dto/CreateDeliveryPerson.dto";
+import { PaginationDto } from "../common/pagination/pagination.dto";
+import { AssignZoneDeliveryPerson } from "./dto/AssignZoneDeliveryPerson.dto";
+import { FindByProximityDeliveryPerson } from "./dto/FindByProximityDeliveryPerson.dto";
 import { ZoneService } from "../zone/zone.service";
 import { Zone } from "../zone/zone.entity";
 
@@ -29,7 +29,7 @@ describe("DeliveryPersonService (unit)", () => {
       manager: {
         getRepository: jest.fn().mockReturnValue({ findOneOrFail: jest.fn() }),
       },
-    } as any;
+    } as unknown as typeof repo;
 
     zoneServiceMock = {
       findManyByIds: jest.fn(),
@@ -51,14 +51,17 @@ describe("DeliveryPersonService (unit)", () => {
   });
 
   it("create() -> debe crear y devolver repartidor", async () => {
-    const dto = { name: "Juan", location: { lat: 0, lng: 0 } };
+    const dto = {
+      name: "Juan",
+      location: { lat: 0, lng: 0 },
+    } as unknown as CreateDeliveryPerson;
     const created = { ...dto };
     const saved = { id: 1, ...dto };
 
     (repo.create as jest.Mock).mockReturnValue(created);
     (repo.save as jest.Mock).mockResolvedValue(saved);
 
-    await expect(service.create(dto as any)).resolves.toEqual(saved);
+    await expect(service.create(dto)).resolves.toEqual(saved);
     expect(repo.create).toHaveBeenCalledWith(dto);
     expect(repo.save).toHaveBeenCalledWith(created);
   });
@@ -67,7 +70,10 @@ describe("DeliveryPersonService (unit)", () => {
     const deliveries = [{ id: 1 }, { id: 2 }];
     (repo.findAndCount as jest.Mock).mockResolvedValue([deliveries, 2]);
 
-    const res = await service.findAll({ limit: 10, offset: 0 } as any);
+    const res = await service.findAll({
+      limit: 10,
+      offset: 0,
+    } as PaginationDto);
     expect(res).toEqual({ deliveries, total: 2 });
     expect(repo.findAndCount).toHaveBeenCalled();
   });
@@ -79,20 +85,22 @@ describe("DeliveryPersonService (unit)", () => {
     await expect(service.findById(1)).resolves.toEqual(entity);
     expect(repo.findOneOrFail).toHaveBeenCalledWith({
       where: { id: 1 },
-      relations: ["zones"] as any,
+      relations: ["zones"],
     });
   });
 
   it("assignZone() -> asigna zonas cuando existe repartidor", async () => {
     const id = 1;
-    const assignDto = { zoneIds: [10, 20] };
+    const assignDto = {
+      zoneIds: [10, 20],
+    } as unknown as AssignZoneDeliveryPerson;
     const deliveryPerson = { id, zones: [] };
     const zones = [{ id: 10 }, { id: 20 }];
     (repo.findOne as jest.Mock).mockResolvedValue(deliveryPerson);
     (zoneServiceMock.findManyByIds as jest.Mock).mockResolvedValue(zones);
     (repo.save as jest.Mock).mockResolvedValue({ id, zones });
 
-    await expect(service.assignZone(id, assignDto as any)).resolves.toEqual({
+    await expect(service.assignZone(id, assignDto)).resolves.toEqual({
       id,
       zones,
     });
@@ -108,7 +116,9 @@ describe("DeliveryPersonService (unit)", () => {
 
   it("assignZone() -> retorna null si no existe repartidor", async () => {
     (repo.findOne as jest.Mock).mockResolvedValue(null);
-    const res = await service.assignZone(999, { zoneIds: [1] } as any);
+    const res = await service.assignZone(999, {
+      zoneIds: [1],
+    } as AssignZoneDeliveryPerson);
     expect(res).toBeNull();
   });
 
@@ -168,7 +178,7 @@ describe("DeliveryPersonService (unit)", () => {
     const res = await service.findByProximity({
       location: base,
       radius,
-    } as any);
+    } as FindByProximityDeliveryPerson);
     expect(Array.isArray(res)).toBe(true);
     // los que quedaron deben ser a y b (c fuera por lejanía en este ejemplo)
     expect(res.some((x) => x.id === 1)).toBe(true);

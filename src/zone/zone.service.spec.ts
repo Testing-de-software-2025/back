@@ -2,6 +2,9 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { ZoneService } from "./zone.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Zone } from "./zone.entity";
+import { CreateZone } from "./dto/CreateZone.dto";
+import { UpdateZone } from "./dto/UpdateZone.dto";
+import { PaginationDto } from "../common/pagination/pagination.dto";
 
 describe("ZoneService (unit)", () => {
   let service: ZoneService;
@@ -29,13 +32,16 @@ describe("ZoneService (unit)", () => {
   });
 
   it("create() -> debe crear y guardar zona", async () => {
-    const dto = { name: "Centro", radius: 5 };
+    const dto = {
+      name: "Centro",
+      radius: 5,
+    } as unknown as CreateZone;
     const created = { ...dto };
     const saved = { id: 1, ...dto };
     mockRepo.create.mockReturnValue(created);
     mockRepo.save.mockResolvedValue(saved);
 
-    await expect(service.create(dto as any)).resolves.toEqual(saved);
+    await expect(service.create(dto)).resolves.toEqual(saved);
     expect(mockRepo.create).toHaveBeenCalledWith(dto);
     expect(mockRepo.save).toHaveBeenCalledWith(created);
   });
@@ -43,7 +49,10 @@ describe("ZoneService (unit)", () => {
   it("findAll() -> devuelve zonas y total", async () => {
     const zones = [{ id: 1 }];
     mockRepo.findAndCount.mockResolvedValue([zones, 1]);
-    const res = await service.findAll({ limit: 10, offset: 0 } as any);
+    const res = await service.findAll({
+      limit: 10,
+      offset: 0,
+    } as PaginationDto);
     expect(res).toEqual({ zones, total: 1 });
     expect(mockRepo.findAndCount).toHaveBeenCalled();
   });
@@ -65,7 +74,7 @@ describe("ZoneService (unit)", () => {
     mockRepo.update.mockResolvedValue(undefined);
     mockRepo.findOne.mockResolvedValue({ id: 1, name: "updated" });
     await expect(
-      service.update(1, { name: "updated" } as any),
+      service.update(1, { name: "updated" } as unknown as UpdateZone),
     ).resolves.toEqual({ id: 1, name: "updated" });
     expect(mockRepo.update).toHaveBeenCalledWith(1, { name: "updated" });
   });

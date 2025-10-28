@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsNumber, IsObject, ValidateNested } from "class-validator";
+import { IsNumber, ValidateNested } from "class-validator";
 import { PaginationDto } from "src/common/pagination/pagination.dto";
 import { LocationDto } from "../../common/dto/Location.dto";
 

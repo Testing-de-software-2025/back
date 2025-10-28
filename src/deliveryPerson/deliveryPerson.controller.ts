@@ -35,8 +35,9 @@ export class DeliveryPersonController {
   async create(@Body() CreateDeliveryPerson: CreateDeliveryPerson) {
     try {
       return await this.deliveryPersonService.create(CreateDeliveryPerson);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Bad request";
+      throw new HttpException(message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -46,8 +47,10 @@ export class DeliveryPersonController {
   async findall(@Query() paginationDto: PaginationDto) {
     try {
       return await this.deliveryPersonService.findAll(paginationDto);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   @UseGuards(AuthGuard)
@@ -58,8 +61,9 @@ export class DeliveryPersonController {
   ): Promise<DeliveryPersonEntity> {
     try {
       return await this.deliveryPersonService.findById(id);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Not found";
+      throw new HttpException(message, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -82,8 +86,10 @@ export class DeliveryPersonController {
         );
       }
       return deliveryPerson;
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -106,8 +112,10 @@ export class DeliveryPersonController {
         );
       }
       return deliveryPerson;
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -121,8 +129,10 @@ export class DeliveryPersonController {
       return await this.deliveryPersonService.findByProximity(
         findByProximityDto,
       );
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -132,8 +142,10 @@ export class DeliveryPersonController {
   async findByZone(@Body() FindByZone: FindByZone) {
     try {
       return await this.deliveryPersonService.findByZone(FindByZone);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -156,8 +168,10 @@ export class DeliveryPersonController {
         );
       }
       return deliveryPerson;
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -176,8 +190,10 @@ export class DeliveryPersonController {
       }
 
       return zones;
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -188,8 +204,10 @@ export class DeliveryPersonController {
     try {
       await this.deliveryPersonService.unassignZone(+id, +zoneId);
       return { message: "Zone removed from delivery" };
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -200,8 +218,10 @@ export class DeliveryPersonController {
     try {
       await this.deliveryPersonService.remove(+id);
       return { message: "Delivery deleted" };
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

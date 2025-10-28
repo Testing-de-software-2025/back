@@ -14,7 +14,6 @@ import {
 } from "@nestjs/common";
 import { ZoneService } from "./zone.service";
 import { Zone } from "./zone.entity";
-import { AssignZone } from "./dto/AssignZone.dto";
 import { CreateZone } from "./dto/CreateZone.dto";
 import { UpdateZone } from "./dto/UpdateZone.dto";
 import { UpdatePartialZone } from "./dto/UpdatePartialZone.dto";
@@ -53,22 +52,26 @@ export class ZoneController {
       }
       return zone;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   @UseGuards(AuthGuard)
   @Permissions(["zone_edit"])
   @Put(":id")
-  async update(@Param("id") id: string, @Body() UpdateZoneDto: CreateZone) {
+  async update(@Param("id") id: string, @Body() updateZoneDto: UpdateZone) {
     try {
-      const zone = await this.zoneService.update(+id, UpdateZoneDto);
+      const zone = await this.zoneService.update(+id, updateZoneDto);
       if (!zone) {
         throw new HttpException("Zone not found", HttpStatus.NOT_FOUND);
       }
       return zone;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -86,7 +89,9 @@ export class ZoneController {
       }
       return zone;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -98,7 +103,9 @@ export class ZoneController {
       await this.zoneService.remove(+id);
       return { message: "Zone deleted successfully" };
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      const message =
+        error instanceof Error ? error.message : "Internal server error";
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

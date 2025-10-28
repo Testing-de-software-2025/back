@@ -4,15 +4,13 @@ Fecha: 19 de octubre de 2025
 
 ## Objetivo del documento
 
-Este archivo recoge exhaustivamente todos los errores, advertencias y salidas relevantes que aparecieron durante la sesión de trabajo para habilitar y estabilizar las pruebas de integración/e2e en este repositorio. Incluye:
+En este documento he recopilado los errores, advertencias y salidas relevantes que detecté mientras trabajaba para que las pruebas de integración y e2e funcionen de forma estable. Está pensado como un registro práctico y reproducible que te ayude a entender qué falló, por qué, y qué cambios hicimos. Incluye:
 
-- Explicación técnica y raíz de cada problema.
-- Fragmentos de código relevantes (del repo) para entender el contexto.
-- Salidas de terminal (ESLint y Jest) utilizadas para el diagnóstico (extractos).
-- Cambios (parches) aplicados y por qué.
-- Comandos reproducibles y recomendaciones para CI.
-
-Este documento es largo por diseño: está pensado como un registro reproducible y una guía para mantener el proyecto en buen estado.
+- Análisis de las causas raíz.
+- Fragmentos de código relevantes del repositorio.
+- Extractos de las salidas de consola (ESLint / Jest) usadas para el diagnóstico.
+- Los cambios que apliqué y la razón técnica detrás de cada uno.
+- Comandos y pasos para reproducir lo hecho en tu máquina o en CI.
 
 ## Índice
 
@@ -28,7 +26,7 @@ Este documento es largo por diseño: está pensado como un registro reproducible
 4. Cambios aplicados (lista concreta de archivos y snippets de patch)
 5. Salvado de salidas de terminal (ESLint / Jest) — extractos usados para diagnóstico
 6. Cómo reproducirlo localmente (comandos y notas para Windows PowerShell)
-7. Recomendaciones y próximos pasos (A/B/C)
+7. Recomendaciones y próximos pasos
 
 8. Diagnóstico inicial y contexto del repo
 
@@ -175,429 +173,50 @@ Solución aplicada:
 
 - Actualizar los fixtures en los tests para incluir `personId`, `location`, `radius`. Ejemplo (test/integration/deliveryPerson.integration-spec.ts):
 
-```ts
+````ts
 const dpPayload: CreateDeliveryPerson = {
   personId: 1,
   location: { lat: 0, lng: 0 },
-  radius: 1,
-};
-await deliveryService.create(dpPayload);
-```
+  # Índice: Informe de errores y soluciones — Microservicio Delivery Zonas
 
-Resultado: las inserciones sucedieron y se eliminaron los errores NOT NULL.
+  Este índice agrupa la documentación que generé mientras estabilizaba las pruebas de integración y e2e. He dividido el contenido en varios archivos para que sea más fácil navegar y revisar por tema.
 
-## 2.6 Advertencias/errores de ESLint y TypeScript en tests y `src/`
+  Archivos disponibles (en la carpeta `docs/`):
 
-Contexto: tras arreglar los errores de ejecución de tests, ejecutamos `npm run lint` y obtuvimos muchos errores y warnings. Algunos eran sobre tests (racimos de `as any`) y otros en `src/` (middlewares, controladores, filtros) con usos inseguros de `any`.
+  - `errors_and_fixes.md` — análisis técnico de los problemas principales y soluciones aplicadas (fragilidad de tests, resolución de módulos en Jest, NOT NULL, drivers, TypeORM/Postgres and linter).
+  - `tests_zone.md` — documentación detallada de las pruebas de `zone` (fixtures, cleanup, comandos de reproducción).
+  - `tests_deliveryPerson.md` — documentación detallada de las pruebas de `deliveryPerson` (fixtures, cleanup, ejemplos).
+  - `anexos/logs-full.txt` — salidas completas capturadas (ESLint, Jest integration, Docker/netstat) para auditoría y referencia.
 
-Extracto de la salida inicial de eslint (resumida):
+  Cómo usar esta carpeta
 
-```
-C:\...\src\common\typeor-exception.filter.ts
- 7:8 error 'e' is defined but never used @typescript-eslint/no-unused-vars
- 15:11 error Unsafe assignment of an `any` value @typescript-eslint/no-unsafe-assignment
+  1. Leer `errors_and_fixes.md` para entender las causas raíz y los parches aplicados.
+  2. Abrir `tests_zone.md` o `tests_deliveryPerson.md` para ver los detalles por área y los comandos de ejecución específicos.
+  3. Revisar `anexos/logs-full.txt` si necesitás las salidas completas para auditoría o para adjuntar en un PR/issue.
 
-C:\...\src\deliveryPerson\deliveryPerson.controller.ts
- 39:37 error Unsafe member access .message on an `any` value @typescript-eslint/no-unsafe-member-access
- ... (más errores similares en controllers)
+  Comandos útiles (desde la raíz del repo):
 
-C:\...\src\middlewares\auth.middleware.ts
- 19:13 error Unsafe assignment of an `any` value
- 20:21 error Unsafe call of a(n) `any` typed value
- 57:17 error Unsafe member access .isAxiosError on an `any` value
-
-test files (ejemplos):
- C:\...\test\integration\deliveryPerson.integration-spec.ts  (advertencias sobre "as any")
- C:\...\test\integration\zone.integration-spec.ts  (parámetro `e` eliminado en catch y cast cambiado)
-
-✖ 79 problems (50 errors, 29 warnings)
-```
-
-Qué hicimos:
-
-- Ejecuté `npx eslint "test/**/*.ts" --fix` para arreglar automáticamente lo que pudo aplicarse en `test/`.
-- Revisé manualmente los archivos de `test/` y reescribí fixtures y castings para usar `as unknown as <DTO>` o tipos directos en lugar de `any`.
-- Apliqué `// eslint-disable-next-line` en llamadas `request(app.getHttpServer() as any)` para evitar falsos positivos en supertest (esto es normal en tests y documentado).
-
-Estado final de los tests (tras las correcciones): los tests de integración pasan y los errores en la carpeta `test/` quedaron resueltos o mitigados. Persisten errores en `src/` — puedo continuar y arreglarlos si lo solicitás.
-
-3. Fragmentos de código relevantes (copiados desde el repo)
-
----
-
-3.1 DTOs
-
-`src/deliveryPerson/dto/CreateDeliveryPerson.dto.ts`:
-
-```ts
-import { Type } from "class-transformer";
-import { IsNumber, IsObject, ValidateNested } from "class-validator";
-import { LocationDto } from "../../common/dto/Location.dto";
-
-export class CreateDeliveryPerson {
-  @IsNumber() personId: number;
-  @IsObject() @ValidateNested() @Type(() => LocationDto) location: LocationDto;
-  @IsNumber() radius: number;
-}
-```
-
-`src/zone/dto/CreateZone.dto.ts`:
-
-```ts
-export class CreateZone {
-  @IsString() name: string;
-  @IsObject() @ValidateNested() @Type(() => LocationDto) location: LocationDto;
-  @IsNumber() radius: number;
-  @IsOptional() deliveryPersonId?: number;
-}
-```
-
-3.2 Entidades (extractos)
-
-`src/deliveryPerson/deliveryPerson.entity.ts` (extracto):
-
-```ts
-@Entity("delivery")
-export class DeliveryPersonEntity extends BaseEntity {
-  @PrimaryGeneratedColumn() id: number;
-  @Column({ type: "integer", name: "personid" }) personId: number;
-  @Column({ type: "jsonb" }) location: { lat: number; lng: number };
-  @Column({ type: "decimal", precision: 10, scale: 3 }) radius: number;
-  @ManyToMany(() => Zone, (zone) => zone.deliveryPerson, { eager: true })
-  @JoinTable()
-  zones: Zone[];
-}
-```
-
-`src/zone/zone.entity.ts` (extracto):
-
-```ts
-@Entity("zone")
-export class Zone extends BaseEntity {
-  @PrimaryGeneratedColumn() id: number;
-  @Column({ type: "varchar", length: 100 }) name: string;
-  @Column({ type: "jsonb" }) location: { lat: number; lng: number };
-  @Column({ type: "decimal", precision: 10, scale: 3 }) radius: number;
-  @ManyToMany(
-    () => DeliveryPersonEntity,
-    (deliveryPerson) => deliveryPerson.zones,
-    { onDelete: "CASCADE" }
-  )
-  deliveryPerson: DeliveryPersonEntity[];
-}
-```
-
-4. Cambios aplicados (lista y ejemplos de patches)
-
----
-
-Ediciones principales realizadas (resumen):
-
-- `test/jest-integration.json`
-
-  - Cambiado `rootDir` a `..` y añadido `moduleNameMapper` para `src/*`.
-
-- `test/integration/deliveryPerson.integration-spec.ts`
-
-  - Reemplazo de `as any` por objetos tipados (`CreateDeliveryPerson`, `CreateZone`, `AssignZoneDeliveryPerson`).
-  - Añadido `afterEach` (y `afterAll`) que ejecuta:
-
-    DELETE FROM "delivery_zones_zone";
-    DELETE FROM "delivery";
-    DELETE FROM "zone";
-
-  - Ejemplo de payload cambiado:
-
-```ts
-const dpPayload: CreateDeliveryPerson = {
-  personId: 1,
-  location: { lat: 0, lng: 0 },
-  radius: 1,
-};
-await deliveryService.create(dpPayload);
-```
-
-- `test/integration/zone.integration-spec.ts`
-
-  - Reemplazado `any` por casts controlados a `CreateZone` y uso de `PaginationDto` en findAll calls.
-  - Eliminado parámetro `e` no usado en catch.
-
-- `test/e2e-utils.ts` y archivos e2e:
-  - `applyAllowAllGuard` tipado correctamente y uso en e2e para bypass de auth.
-  - En e2e, tipado explícito de `resPost.body` y `resGet.body` para evitar `any`.
-
-5. Salidas de terminal (extractos completos y relevantes)
-
----
-
-5.1 ESLint (salida resumida usada en el diagnóstico)
-
-Primera ejecución (sobre todo el repo) devolvió:
-
-```
-✖ 79 problems (50 errors, 29 warnings)
-
-C:\...\src\common\typeor-exception.filter.ts
- 7:8   error  'e' is defined but never used               @typescript-eslint/no-unused-vars
-15:11  error  Unsafe assignment of an `any` value         @typescript-eslint/no-unsafe-assignment
-...
-
-C:\...\src\deliveryPerson\deliveryPerson.controller.ts
- 39:31  warning  Unsafe argument of type `any` assigned to a parameter of type `string | Record<string, any>`
- 39:37  error    Unsafe member access .message on an `any` value
- ... (múltiples entradas similares en otros archivos)
-
-test files: varios avisos relacionados con `as any` y castings en tests.
-```
-
-Después de aplicar fixes en `test/` y parches manuales, la mayoría de errores en `test/` fueron resueltos. Persisten errores en `src/` (middlewares/controladores) — si querés los arreglo también.
-
-5.2 Jest (integración) — salida final que muestra tests verdes
-
-Comando ejecutado:
-
-```powershell
-npx jest --config test/jest-integration.json --runInBand
-```
-
-Salida final (extracto):
-
-```
-PASS  test/integration/deliveryPerson.integration-spec.ts
-  (TypeORM printed multiple queries during the run)
-
-PASS  test/integration/zone.integration-spec.ts
-
-Test Suites: 2 passed, 2 total
-Tests:       3 passed, 3 total
-Time:        ~5.2 s
-```
-
-Durante la ejecución, TypeORM volcó queries como:
-
-```
-INSERT INTO "delivery"("personid", "location", "radius", "status") VALUES ($1, $2, $3, DEFAULT) RETURNING "id", "status"
--- PARAMETERS: [1, "{\"lat\":0,\"lng\":0}", 1]
-
-INSERT INTO "zone"("name", "location", "radius") VALUES ($1, $2, $3) RETURNING "id"
--- PARAMETERS: ["Z1","{\"lat\":0,\"lng\":0}",5]
-
-DELETE FROM "delivery_zones_zone"
-DELETE FROM "delivery"
-DELETE FROM "zone"
-```
-
-6. Cómo reproducir localmente (pasos para Windows PowerShell)
-
----
-
-1. Levantar PostgreSQL (si no tenés `delivery2`):
-
-```powershell
-docker run --name pg-test -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:15
-```
-
-2. Ejecutar la suite de integración:
-
-```powershell
-npx jest --config test/jest-integration.json --runInBand
-```
-
-3. Ejecutar ESLint solo en tests (auto-fix):
-
-```powershell
-npx eslint "test/**/*.ts" --fix
-```
-
-4. Comprobación de tipos:
-
-```powershell
-npx tsc --noEmit
-```
-
-7. Recomendaciones y próximos pasos (opciones)
-
----
-
-Puedo continuar con cualquiera de estas tareas (decime la letra):
-
-- A: Corregir TODOS los errores ESLint/TS en `src/` (va a requerir tocar middlewares, controladores y filtros; dejará `npm run lint` limpio).
-- B: Reemplazar `DELETE FROM` por `repository.clear()` o por transacciones por test (mejora el aislamiento, recomienda `repo.clear()` o transacciones con rollback para paralelismo posible).
-- C: Preparar una integración CI con Testcontainers para correr tests de integración contra una BD efímera en CI.
-
-Si querés que incluya las salidas completas sin resumir (todo el log de eslint y jest con todas las queries), dímelo y lo pego como anexos (podría aumentar mucho el tamaño del archivo).
-
----
-
-## Registro de cambios aplicados (patches resumidos)
-
-- `test/jest-integration.json` — rootDir: `..`; moduleNameMapper para `src/*`.
-- `test/integration/deliveryPerson.integration-spec.ts` — payloads tipados, `afterEach` y `afterAll` cleanup, reemplazo de `any`.
-- `test/integration/zone.integration-spec.ts` — payloads tipados, eliminación de variable `e` en catch, `afterEach`/`afterAll` cleanup.
-- `test/e2e-utils.ts` — tipado de helper y eliminación de imports no usados.
-- `test/deliveryPerson.e2e-spec.ts`, `test/zone.e2e-spec.ts` — tipado de respuesta y pequeñas defensas anti-linter en llamadas `request(app.getHttpServer() as any)`.
-
-Completé el documento con los fragmentos y salidas principales. Dime ahora si querés que:
-
-- Añada las salidas COMPLETAS de ESLint (todo el output, no sólo extractos).
-- Empiece la opción A, B o C (indica la letra).
-- Genere un commit / branch con todos los cambios y cree un PR (puedo preparar el PR si querés).
-
-Fin del informe extendido.
-
-C:\...\test\integration\zone.integration-spec.ts (parámetro `e` eliminado en catch, reemplazado cast `as any` por tipo de DTO)
-
-Al final de la ejecución se reportaron en ese momento: ✖ 79 problems (50 errors, 29 warnings) (esta es la salida inicial resumida cuando ejecutamos eslint sobre todo el proyecto). Más adelante, tras las correcciones incrementales, bajó a ~73 y se redujo la mayor parte dentro de `test/`.
-
-- Correcciones concretas realizadas durante la sesión (paso a paso):
-
-  1. Ejecuté `npx eslint "test/**/*.ts" --fix` para aplicar arreglos automáticos solamente en la carpeta `test/`.
-  2. Revisé manualmente los archivos que `--fix` no pudo arreglar (casts inseguros, variables no usadas) y edité:
-
-     - `test/integration/deliveryPerson.integration-spec.ts` (reemplazos por tipos y `afterEach` cleanup)
-     - `test/integration/zone.integration-spec.ts` (correcciones de tipos y eliminación de parámetros no usados en catch)
-     - `test/e2e-utils.ts` (tipado de helper e import fixes)
-     - `test/deliveryPerson.e2e-spec.ts` y `test/zone.e2e-spec.ts` (tipé cuerpos de respuesta y añadí `eslint-disable-next-line` en llamadas supertest donde el linter reclamaba `no-unsafe-argument`)
-
-  3. Re-ejecuté `npm run lint` y `npx tsc --noEmit` para verificar que no introduje errores de tipo; también re-ejecuté las suites de integración con `npx jest --config test/jest-integration.json --runInBand`.
-
-  4. Resultado final en `test/`: los warnings/errores relevantes en archivos de `test/` fueron corregidos o mitigados (casts controlados, tipado). Persisten errores en `src/` que no forman parte de la petición inmediata del usuario (puedo corregirlos si lo deseás).
-
-- Salidas de Jest (integración) - resumen de la ejecución final
-
-  Comando ejecutado:
-
+  ```powershell
+  # Ejecutar todos los tests de integración
   npx jest --config test/jest-integration.json --runInBand
 
-  Resultado (extracto final):
+  # Ejecutar eslint solo en tests y aplicar arreglos automáticos
+  npx eslint "test/**/*.ts" --fix
 
-  PASS test/integration/deliveryPerson.integration-spec.ts
-  (varios logs de TypeORM mostrados durante la ejecución)
-  PASS test/integration/zone.integration-spec.ts
+  # Verificar tipos
+  npx tsc --noEmit
+````
 
-  Test Suites: 2 passed, 2 total
-  Tests: 3 passed, 3 total
-  Time: ~5.2 s
+Si querés que además:
 
-  (Durante la ejecución TypeORM volcó muchas consultas SQL en consola — las omitimos aquí pero se usaron para verificar que las inserciones/commits/transacciones sucedieran correctamente. Las consultas relevantes incluyeron INSERT INTO "delivery"..., INSERT INTO "zone"..., DELETE FROM "delivery_zones_zone" y commits.)
+- deje `docs/` aún más granular (por ejemplo separar "parches aplicados" en su propio archivo),
+- o prefieres que haga un commit/branch con todos los cambios y cree un PR,
 
----
-
-## Cambios aplicados (lista de archivos modificados y por qué)
-
-- `src/app.module.ts`
-
-  - Ajustes previos hechos en la sesión para apuntar TypeORM a la base `delivery2` del usuario (host: localhost, port: 5432, usuario/password postgres). Esto permitió ejecutar integration tests contra la DB real.
-
-- `test/jest-integration.json`
-
-  - `rootDir` fijado a `..` y `moduleNameMapper` mapeando `^src/(.*)$` a `<rootDir>/src/$1` para que imports `src/...` funcionen desde `test/`.
-
-- `test/integration/deliveryPerson.integration-spec.ts`
-
-  - Reemplacé `as any` por objetos tipados y `as unknown as ...` cuando fue necesario.
-  - Añadí `afterEach` + `afterAll` cleanup que ejecuta queries SQL para borrar datos creados durante las pruebas.
-  - Añadí campos obligatorios en fixtures (personId, location, radius) para evitar violaciones NOT NULL.
-
-- `test/integration/zone.integration-spec.ts`
-
-  - Analogous fixes: payloads tipados, eliminación de parámetro `e` no usado en catch, `afterEach` cleanup, reemplazo de `as any` por tipos de DTO.
-
-- `test/e2e-utils.ts`
-
-  - Tipado del helper `applyAllowAllGuard` como `INestApplication` y eliminación de imports/params no usados.
-
-- `test/deliveryPerson.e2e-spec.ts` y `test/zone.e2e-spec.ts`
-  - Tipé `resPost.body` y `resGet.body` para evitar accesos a `any` y añadí `eslint-disable-next-line` en las llamadas `request(app.getHttpServer() as any)` donde el linter marcaba `@typescript-eslint/no-unsafe-argument`.
-
-## Parches aplicados (resumen técnico)
-
-- Quité casts inseguros y sustituí por objetos tipados con DTOs reales (`CreateDeliveryPerson`, `CreateZone`, `FindByProximityDeliveryPerson`, `AssignZoneDeliveryPerson`, `PaginationDto`).
-- Añadí cleanup en `afterEach` y `afterAll` que ejecuta (en DataSource) las consultas:
-
-  DELETE FROM "delivery_zones_zone";
-  DELETE FROM "delivery";
-  DELETE FROM "zone";
-
-  (orden importante: pivot primero, después entidades)
-
-- Añadí pequeños `// eslint-disable-next-line @typescript-eslint/no-unsafe-argument` en los lugares donde `supertest` y `app.getHttpServer()` causaban falsos positivos del linter; esto es aceptable en tests y fue documentado en los commits.
-
-## Cómo reproducir localmente (comandos)
-
-1. Asegurá que la base Postgres `delivery2` esté disponible en localhost:5432 (usuario/password `postgres` si usás la config que usamos). Si usás Docker:
-
-```powershell
-docker run --name pg-test -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:15
-```
-
-2. Ejecutá la suite de integración (desde la raíz del repo):
-
-```powershell
-npx jest --config test/jest-integration.json --runInBand
-```
-
-3. Para ejecutar ESLint solo en tests y aplicar arreglos automáticos:
-
-```powershell
-npx eslint "test/**/*.ts" --fix
-```
-
-4. Si querés hacer un chequeo de tipos global:
-
-```powershell
-npx tsc --noEmit
-```
-
-## Notas finales y recomendaciones (detalladas)
-
-1. Limpieza y aislamiento (mejoras opcionales):
-
-   - La estrategia actual usa `DELETE FROM` en `afterEach`/`afterAll`. Es rápida y clara, pero en CI a gran escala conviene usar Testcontainers o transacciones con rollback para cada test (evita efectos colaterales y hace las pruebas paralelizables).
-
-2. Linter / TS en `src/`:
-
-   - Durante la sesión apunté y arreglé principalmente `test/`. Quedan errores/advertencias en `src/` (por ejemplo middlewares y controladores con `any`), listados en la salida de ESLint incluida arriba. Puedo seguir y corregir esos archivos si querés.
-
-3. Migraciones:
-   - Recomiendo reemplazar `synchronize: true` por migraciones en entornos CI/producción.
+decime y lo hago. También puedo proceder a corregir los warnings/errores restantes en `src/` si querés dejar el repo completamente limpio.
 
 ---
 
-Si querés, a continuación puedo:
-
-- A: Arreglar todos los errores ESLint/TS en `src/` (me lo pedís y lo hago). Esto es más intrusivo pero deja el repo limpio.
-- B: Sustituir `DELETE FROM` por repositorio `.clear()` o transacciones por test y documentarlo.
-- C: Preparar un workflow de CI que arranque Postgres (Testcontainers o servicio) y ejecute tests de integración de forma aislada.
-
-Dime la letra (A/B/C) o pedime que haga las tres; empiezo inmediatamente y te mantengo informado con commits y salida de terminal verificable.
-
-Fin del informe extendido.
-
----
-
-## Recomendaciones finales y pasos siguientes
-
-1. Aislamiento de pruebas: actualmente las pruebas de integración usan la base `delivery2` y TypeORM `synchronize: true` para crear tablas. Si quieres independencia y repetibilidad:
-
-   - Ejecutar Postgres en un contenedor temporal por cada run (Testcontainers o arrancar/stop del contenedor via script). O
-   - Limpiar las tablas en `afterAll` para que el estado sea determinista.
-
-2. Calidad del código: resolver advertencias de lint/TS en los tests (evitar `any`, formatear, remover variables no usadas).
-
-3. Migraciones: para control del esquema en CI/prod, usar migraciones en lugar de `synchronize: true`.
-
-4. Si prefieres que automatice A (limpieza en afterAll) y D (limpieza de warnings), procedo ahora con las modificaciones y correré nuevamente los tests para verificar.
-
----
-
-## Log de comandos relevantes usados durante la sesión
-
-- npx jest --config test/jest-integration.json --runInBand
-- docker ps -a
-- netstat -ano | findstr 5432
-
----
+## En los próximos pasos crearé el branch/commit/documentos finales si me confirmás que la estructura y la redacción te convencen.
 
 Si quieres que incluya también fragmentos exactos del output del terminal (trazas completas), dime y los agregaré como anexos en este archivo.
 
