@@ -19,15 +19,15 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             typeorm_1.TypeOrmModule.forRoot({
-                type: 'postgres',
-                host: 'localhost',
+                type: "postgres",
+                host: "localhost",
                 port: 5433,
-                database: 'deliveryzona',
-                username: 'postgres',
-                password: 'postgres',
+                database: "deliveryzona",
+                username: "postgres",
+                password: "postgres",
                 synchronize: true,
                 entities: entities_1.entities,
-                logging: true
+                logging: true,
             }),
             zone_module_1.ZoneModule,
             deliveryPerson_module_1.DeliveryPersonModule,

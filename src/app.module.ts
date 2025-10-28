@@ -9,8 +9,8 @@ import { DeliveryPersonModule } from "./deliveryPerson/deliveryPerson.module";
     TypeOrmModule.forRoot({
       type: "postgres",
       host: "localhost",
-      port: 5432,
-      database: "delivery2",
+      port: 5433,
+      database: "deliveryzona",
       username: "postgres",
       password: "postgres",
       synchronize: true,

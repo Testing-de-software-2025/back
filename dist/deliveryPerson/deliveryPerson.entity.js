@@ -50,7 +50,7 @@ __decorate([
 ], DeliveryPersonEntity.prototype, "radius", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
+        type: "enum",
         enum: DeliveryPersonStatus,
         default: DeliveryPersonStatus.AVAILABLE,
     }),
@@ -62,6 +62,6 @@ __decorate([
     __metadata("design:type", Array)
 ], DeliveryPersonEntity.prototype, "zones", void 0);
 exports.DeliveryPersonEntity = DeliveryPersonEntity = __decorate([
-    (0, typeorm_1.Entity)('delivery')
+    (0, typeorm_1.Entity)("delivery")
 ], DeliveryPersonEntity);
 //# sourceMappingURL=deliveryPerson.entity.js.map

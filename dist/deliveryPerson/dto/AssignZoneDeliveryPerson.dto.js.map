@@ -1,1 +1,1 @@
-{"version":3,"file":"AssignZoneDeliveryPerson.dto.js","sourceRoot":"","sources":["../../../src/deliveryPerson/dto/AssignZoneDeliveryPerson.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AACA,qDAA0D;AAE1D,MAAa,wBAAwB;IAEjC,OAAO,CAAW;CACrB;AAHD,4DAGC;AADG;IADC,IAAA,yBAAO,GAAE;;yDACQ"}
+{"version":3,"file":"AssignZoneDeliveryPerson.dto.js","sourceRoot":"","sources":["../../../src/deliveryPerson/dto/AssignZoneDeliveryPerson.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AACA,qDAA0D;AAE1D,MAAa,wBAAwB;IAEnC,OAAO,CAAW;CACnB;AAHD,4DAGC;AADC;IADC,IAAA,yBAAO,GAAE;;yDACQ"}

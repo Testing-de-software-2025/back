@@ -1,14 +1,14 @@
-import { Repository } from 'typeorm';
-import { DeliveryPersonEntity, DeliveryPersonStatus } from './deliveryPerson.entity';
-import { Zone } from '../zone/zone.entity';
-import { ZoneService } from '../zone/zone.service';
-import { PaginationDto } from '../common/pagination/pagination.dto';
-import { CreateDeliveryPerson } from './dto/CreateDeliveryPerson.dto';
-import { UpdateLocationDeliveryPerson } from './dto/UpdateLocationDeliveryPerson.dto';
-import { UpdateStatusDeliveryPerson } from './dto/UpdateStatusDeliveryPerson.dto';
-import { FindByProximityDeliveryPerson } from './dto/FindByProximityDeliveryPerson.dto';
-import { FindByZone } from './dto/FindByZone.dto';
-import { AssignZoneDeliveryPerson } from './dto/AssignZoneDeliveryPerson.dto';
+import { Repository } from "typeorm";
+import { DeliveryPersonEntity, DeliveryPersonStatus } from "./deliveryPerson.entity";
+import { Zone } from "../zone/zone.entity";
+import { ZoneService } from "../zone/zone.service";
+import { PaginationDto } from "../common/pagination/pagination.dto";
+import { CreateDeliveryPerson } from "./dto/CreateDeliveryPerson.dto";
+import { UpdateLocationDeliveryPerson } from "./dto/UpdateLocationDeliveryPerson.dto";
+import { UpdateStatusDeliveryPerson } from "./dto/UpdateStatusDeliveryPerson.dto";
+import { FindByProximityDeliveryPerson } from "./dto/FindByProximityDeliveryPerson.dto";
+import { FindByZone } from "./dto/FindByZone.dto";
+import { AssignZoneDeliveryPerson } from "./dto/AssignZoneDeliveryPerson.dto";
 export declare class DeliveryPersonService {
     private readonly deliveryPersonRepository;
     private readonly zoneService;

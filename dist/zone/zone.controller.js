@@ -35,7 +35,7 @@ let ZoneController = class ZoneController {
         try {
             const zone = await this.zoneService.findOne(+id);
             if (!zone) {
-                throw new common_1.HttpException('Zone not found', common_1.HttpStatus.NOT_FOUND);
+                throw new common_1.HttpException("Zone not found", common_1.HttpStatus.NOT_FOUND);
             }
             return zone;
         }
@@ -47,7 +47,7 @@ let ZoneController = class ZoneController {
         try {
             const zone = await this.zoneService.update(+id, UpdateZoneDto);
             if (!zone) {
-                throw new common_1.HttpException('Zone not found', common_1.HttpStatus.NOT_FOUND);
+                throw new common_1.HttpException("Zone not found", common_1.HttpStatus.NOT_FOUND);
             }
             return zone;
         }
@@ -59,7 +59,7 @@ let ZoneController = class ZoneController {
         try {
             const zone = await this.zoneService.updatePartial(+id, updateZoneDto);
             if (!zone) {
-                throw new common_1.HttpException('Zone not found', common_1.HttpStatus.NOT_FOUND);
+                throw new common_1.HttpException("Zone not found", common_1.HttpStatus.NOT_FOUND);
             }
             return zone;
         }
@@ -70,7 +70,7 @@ let ZoneController = class ZoneController {
     async remove(id) {
         try {
             await this.zoneService.remove(+id);
-            return { message: 'Zone deleted successfully' };
+            return { message: "Zone deleted successfully" };
         }
         catch (error) {
             throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,7 +80,7 @@ let ZoneController = class ZoneController {
 exports.ZoneController = ZoneController;
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['zone_read']),
+    (0, permissions_decorator_1.Permissions)(["zone_read"]),
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -89,7 +89,7 @@ __decorate([
 ], ZoneController.prototype, "findAll", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['zone_create']),
+    (0, permissions_decorator_1.Permissions)(["zone_create"]),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -98,18 +98,18 @@ __decorate([
 ], ZoneController.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['zone_read']),
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, permissions_decorator_1.Permissions)(["zone_read"]),
+    (0, common_1.Get)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ZoneController.prototype, "findOne", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['zone_edit']),
-    (0, common_1.Put)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, permissions_decorator_1.Permissions)(["zone_edit"]),
+    (0, common_1.Put)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, CreateZone_dto_1.CreateZone]),
@@ -117,9 +117,9 @@ __decorate([
 ], ZoneController.prototype, "update", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['zone_edit']),
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, permissions_decorator_1.Permissions)(["zone_edit"]),
+    (0, common_1.Patch)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, UpdatePartialZone_dto_1.UpdatePartialZone]),
@@ -127,15 +127,15 @@ __decorate([
 ], ZoneController.prototype, "updatePartial", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['zone_delete']),
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, permissions_decorator_1.Permissions)(["zone_delete"]),
+    (0, common_1.Delete)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ZoneController.prototype, "remove", null);
 exports.ZoneController = ZoneController = __decorate([
-    (0, common_1.Controller)('zones'),
+    (0, common_1.Controller)("zones"),
     __metadata("design:paramtypes", [zone_service_1.ZoneService])
 ], ZoneController);
 //# sourceMappingURL=zone.controller.js.map

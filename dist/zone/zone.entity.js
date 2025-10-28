@@ -37,10 +37,10 @@ __decorate([
     __metadata("design:type", Number)
 ], Zone.prototype, "radius", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => deliveryPerson_entity_1.DeliveryPersonEntity, deliveryPerson => deliveryPerson.zones, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.ManyToMany)(() => deliveryPerson_entity_1.DeliveryPersonEntity, (deliveryPerson) => deliveryPerson.zones, { onDelete: "CASCADE" }),
     __metadata("design:type", Array)
 ], Zone.prototype, "deliveryPerson", void 0);
 exports.Zone = Zone = __decorate([
-    (0, typeorm_1.Entity)('zone')
+    (0, typeorm_1.Entity)("zone")
 ], Zone);
 //# sourceMappingURL=zone.entity.js.map

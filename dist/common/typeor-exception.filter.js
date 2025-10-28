@@ -14,8 +14,8 @@ let TypeOrmExceptionFilter = class TypeOrmExceptionFilter {
         const ctx = host.switchToHttp();
         const res = ctx.getResponse();
         const error = exception;
-        let status = common_1.HttpStatus.BAD_REQUEST;
-        let message = 'Error en la base de datos';
+        const status = common_1.HttpStatus.BAD_REQUEST;
+        const message = "Error en la base de datos";
         res.status(status).json({
             statusCode: status,
             message,

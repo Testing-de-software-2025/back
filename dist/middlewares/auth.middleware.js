@@ -23,29 +23,30 @@ let AuthGuard = class AuthGuard {
     async canActivate(context) {
         try {
             const request = context.switchToHttp().getRequest();
-            const token = request.headers.authorization?.replace('Bearer ', '');
+            const token = request.headers.authorization?.replace("Bearer ", "");
             if (!token) {
-                throw new common_1.UnauthorizedException('No token provided');
+                throw new common_1.UnauthorizedException("No token provided");
             }
             const permissions = this.reflector.get(permissions_decorator_1.Permissions, context.getHandler());
-            const baseURL = process.env.JWT_SERVICE_URL || 'http://localhost:3001';
+            const baseURL = process.env.JWT_SERVICE_URL || "http://localhost:3001";
             const requests = permissions.map((permission) => axios_1.default.get(`${baseURL}/can-do/${permission}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
             }));
             const results = await Promise.allSettled(requests);
-            const atLeastOneAllowed = results.some((result) => result.status === 'fulfilled' && result.value.data);
+            const atLeastOneAllowed = results.some((result) => result.status === "fulfilled" && result.value.data);
             if (atLeastOneAllowed) {
                 return true;
             }
             else {
-                throw new common_1.ForbiddenException('Insufficient permissions');
+                throw new common_1.ForbiddenException("Insufficient permissions");
             }
         }
         catch (error) {
-            if (error instanceof common_1.UnauthorizedException || error instanceof common_1.ForbiddenException) {
+            if (error instanceof common_1.UnauthorizedException ||
+                error instanceof common_1.ForbiddenException) {
                 throw error;
             }
             if (error.isAxiosError && error.response) {
@@ -58,7 +59,7 @@ let AuthGuard = class AuthGuard {
                     throw new common_1.ForbiddenException(message);
                 }
             }
-            throw new common_1.UnauthorizedException('An unexpected error occurred');
+            throw new common_1.UnauthorizedException("An unexpected error occurred");
         }
     }
 };

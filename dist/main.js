@@ -8,8 +8,8 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.useGlobalFilters(new typeor_exception_filter_1.TypeOrmExceptionFilter());
     app.enableCors({
-        origin: 'http://localhost:4200',
-        credentials: true
+        origin: "http://localhost:4200",
+        credentials: true,
     });
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,

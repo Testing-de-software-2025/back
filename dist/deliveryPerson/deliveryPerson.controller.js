@@ -129,7 +129,7 @@ let DeliveryPersonController = class DeliveryPersonController {
     async remove(id) {
         try {
             await this.deliveryPersonService.remove(+id);
-            return { message: 'Delivery deleted' };
+            return { message: "Delivery deleted" };
         }
         catch (error) {
             throw new common_1.HttpException(error.message, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
@@ -139,7 +139,7 @@ let DeliveryPersonController = class DeliveryPersonController {
 exports.DeliveryPersonController = DeliveryPersonController;
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_create']),
+    (0, permissions_decorator_1.Permissions)(["delivery_create"]),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -148,7 +148,7 @@ __decorate([
 ], DeliveryPersonController.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_read']),
+    (0, permissions_decorator_1.Permissions)(["delivery_read"]),
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -157,18 +157,18 @@ __decorate([
 ], DeliveryPersonController.prototype, "findall", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_read']),
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    (0, permissions_decorator_1.Permissions)(["delivery_read"]),
+    (0, common_1.Get)(":id"),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], DeliveryPersonController.prototype, "findOne", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_edit']),
+    (0, permissions_decorator_1.Permissions)(["delivery_edit"]),
     (0, common_1.Put)(":id/location"),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, UpdateLocationDeliveryPerson_dto_1.UpdateLocationDeliveryPerson]),
@@ -176,9 +176,9 @@ __decorate([
 ], DeliveryPersonController.prototype, "updateLocation", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_edit']),
+    (0, permissions_decorator_1.Permissions)(["delivery_edit"]),
     (0, common_1.Put)(":id/status"),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, UpdateStatusDeliveryPerson_dto_1.UpdateStatusDeliveryPerson]),
@@ -186,8 +186,8 @@ __decorate([
 ], DeliveryPersonController.prototype, "updateStatus", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_read', 'delivery_zone_assignment']),
-    (0, common_1.Post)('findByProximity'),
+    (0, permissions_decorator_1.Permissions)(["delivery_read", "delivery_zone_assignment"]),
+    (0, common_1.Post)("findByProximity"),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [FindByProximityDeliveryPerson_dto_1.FindByProximityDeliveryPerson]),
@@ -195,8 +195,8 @@ __decorate([
 ], DeliveryPersonController.prototype, "findByProximity", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_read', 'delivery_zone_assignment']),
-    (0, common_1.Post)('findByZone'),
+    (0, permissions_decorator_1.Permissions)(["delivery_read", "delivery_zone_assignment"]),
+    (0, common_1.Post)("findByZone"),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [FindByZone_dto_1.FindByZone]),
@@ -204,9 +204,9 @@ __decorate([
 ], DeliveryPersonController.prototype, "findByZone", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_zone_assignment']),
-    (0, common_1.Post)(':id/assignZone'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, permissions_decorator_1.Permissions)(["delivery_zone_assignment"]),
+    (0, common_1.Post)(":id/assignZone"),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, AssignZoneDeliveryPerson_dto_1.AssignZoneDeliveryPerson]),
@@ -214,34 +214,34 @@ __decorate([
 ], DeliveryPersonController.prototype, "assignZone", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_read']),
-    (0, common_1.Get)(':id/zones'),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    (0, permissions_decorator_1.Permissions)(["delivery_read"]),
+    (0, common_1.Get)(":id/zones"),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], DeliveryPersonController.prototype, "getZonesAssigned", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_zone_assignment']),
+    (0, permissions_decorator_1.Permissions)(["delivery_zone_assignment"]),
     (0, common_1.Delete)(":id/zone/:zoneId"),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Param)('zoneId')),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Param)("zoneId")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], DeliveryPersonController.prototype, "removeZone", null);
 __decorate([
     (0, common_1.UseGuards)(auth_middleware_1.AuthGuard),
-    (0, permissions_decorator_1.Permissions)(['delivery_delete']),
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, permissions_decorator_1.Permissions)(["delivery_delete"]),
+    (0, common_1.Delete)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], DeliveryPersonController.prototype, "remove", null);
 exports.DeliveryPersonController = DeliveryPersonController = __decorate([
-    (0, common_1.Controller)('delivery'),
+    (0, common_1.Controller)("delivery"),
     __metadata("design:paramtypes", [deliveryPerson_service_1.DeliveryPersonService])
 ], DeliveryPersonController);
 //# sourceMappingURL=deliveryPerson.controller.js.map

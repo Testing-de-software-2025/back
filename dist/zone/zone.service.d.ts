@@ -1,9 +1,9 @@
-import type { Repository } from 'typeorm';
-import { Zone } from './zone.entity';
-import { PaginationDto } from '../common/pagination/pagination.dto';
-import { CreateZone } from './dto/CreateZone.dto';
-import { UpdateZone } from './dto/UpdateZone.dto';
-import { UpdatePartialZone } from './dto/UpdatePartialZone.dto';
+import type { Repository } from "typeorm";
+import { Zone } from "./zone.entity";
+import { PaginationDto } from "../common/pagination/pagination.dto";
+import { CreateZone } from "./dto/CreateZone.dto";
+import { UpdateZone } from "./dto/UpdateZone.dto";
+import { UpdatePartialZone } from "./dto/UpdatePartialZone.dto";
 export declare class ZoneService {
     private readonly zoneRepository;
     constructor(zoneRepository: Repository<Zone>);

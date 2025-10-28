@@ -1,12 +1,12 @@
-import { DeliveryPersonService } from './deliveryPerson.service';
-import { PaginationDto } from '../common/pagination/pagination.dto';
-import { CreateDeliveryPerson } from './dto/CreateDeliveryPerson.dto';
-import { UpdateLocationDeliveryPerson } from './dto/UpdateLocationDeliveryPerson.dto';
-import { UpdateStatusDeliveryPerson } from './dto/UpdateStatusDeliveryPerson.dto';
-import { FindByProximityDeliveryPerson } from './dto/FindByProximityDeliveryPerson.dto';
-import { FindByZone } from './dto/FindByZone.dto';
-import { AssignZoneDeliveryPerson } from './dto/AssignZoneDeliveryPerson.dto';
-import { DeliveryPersonEntity } from './deliveryPerson.entity';
+import { DeliveryPersonService } from "./deliveryPerson.service";
+import { PaginationDto } from "../common/pagination/pagination.dto";
+import { CreateDeliveryPerson } from "./dto/CreateDeliveryPerson.dto";
+import { UpdateLocationDeliveryPerson } from "./dto/UpdateLocationDeliveryPerson.dto";
+import { UpdateStatusDeliveryPerson } from "./dto/UpdateStatusDeliveryPerson.dto";
+import { FindByProximityDeliveryPerson } from "./dto/FindByProximityDeliveryPerson.dto";
+import { FindByZone } from "./dto/FindByZone.dto";
+import { AssignZoneDeliveryPerson } from "./dto/AssignZoneDeliveryPerson.dto";
+import { DeliveryPersonEntity } from "./deliveryPerson.entity";
 export declare class DeliveryPersonController {
     private readonly deliveryPersonService;
     constructor(deliveryPersonService: DeliveryPersonService);

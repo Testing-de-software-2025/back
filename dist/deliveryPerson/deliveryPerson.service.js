@@ -23,7 +23,10 @@ let DeliveryPersonService = class DeliveryPersonService {
     deliveryPersonRepository;
     zoneService;
     async unassignAllZones(deliveryPersonId) {
-        const deliveryPerson = await this.deliveryPersonRepository.findOneOrFail({ where: { id: deliveryPersonId }, relations: ['zones'] });
+        const deliveryPerson = await this.deliveryPersonRepository.findOneOrFail({
+            where: { id: deliveryPersonId },
+            relations: ["zones"],
+        });
         deliveryPerson.zones = [];
         return await this.deliveryPersonRepository.save(deliveryPerson);
     }
@@ -40,15 +43,20 @@ let DeliveryPersonService = class DeliveryPersonService {
         const [deliveries, total] = await this.deliveryPersonRepository.findAndCount({
             take: limit,
             skip: offset,
-            relations: ['zones'],
+            relations: ["zones"],
         });
         return { deliveries, total };
     }
     async findById(id) {
-        return await this.deliveryPersonRepository.findOneOrFail({ where: { id }, relations: ['zones'] });
+        return await this.deliveryPersonRepository.findOneOrFail({
+            where: { id },
+            relations: ["zones"],
+        });
     }
     async updateLocation(id, updateLocation) {
-        const deliveryPerson = await this.deliveryPersonRepository.findOne({ where: { id } });
+        const deliveryPerson = await this.deliveryPersonRepository.findOne({
+            where: { id },
+        });
         if (!deliveryPerson) {
             throw new common_1.NotFoundException(`Delivery person with ID ${id} not found`);
         }
@@ -56,7 +64,9 @@ let DeliveryPersonService = class DeliveryPersonService {
         return this.deliveryPersonRepository.save(deliveryPerson);
     }
     async updateStatus(id, dto) {
-        const entity = await this.deliveryPersonRepository.findOneOrFail({ where: { id } });
+        const entity = await this.deliveryPersonRepository.findOneOrFail({
+            where: { id },
+        });
         Object.assign(entity, dto);
         return this.deliveryPersonRepository.save(entity);
     }
@@ -99,7 +109,7 @@ let DeliveryPersonService = class DeliveryPersonService {
     async getZonesAssigned(deliveryPersonId) {
         const deliveryPerson = await this.deliveryPersonRepository.findOne({
             where: { id: deliveryPersonId },
-            relations: ['zones'],
+            relations: ["zones"],
         });
         if (!deliveryPerson) {
             throw new Error(`Delivery person with ID ${deliveryPersonId} not found`);
@@ -109,10 +119,12 @@ let DeliveryPersonService = class DeliveryPersonService {
     async unassignZone(deliveryPersonId, zoneId) {
         const deliveryPerson = await this.deliveryPersonRepository.findOneOrFail({
             where: { id: deliveryPersonId },
-            relations: ['zones'],
+            relations: ["zones"],
         });
-        const zone = await this.deliveryPersonRepository.manager.getRepository(zone_entity_1.Zone).findOneOrFail({ where: { id: zoneId } });
-        deliveryPerson.zones = deliveryPerson.zones.filter(z => z.id !== zone.id);
+        const zone = await this.deliveryPersonRepository.manager
+            .getRepository(zone_entity_1.Zone)
+            .findOneOrFail({ where: { id: zoneId } });
+        deliveryPerson.zones = deliveryPerson.zones.filter((z) => z.id !== zone.id);
         return await this.deliveryPersonRepository.save(deliveryPerson);
     }
     async remove(id) {
@@ -132,7 +144,10 @@ let DeliveryPersonService = class DeliveryPersonService {
         const dLat = this.deg2rad(lat2 - lat1);
         const dLon = this.deg2rad(lon2 - lon1);
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            Math.cos(this.deg2rad(lat1)) *
+                Math.cos(this.deg2rad(lat2)) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const distance = R * c;
         return distance;
