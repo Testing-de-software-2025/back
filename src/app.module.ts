@@ -11,8 +11,8 @@ import { DeliveryPersonModule } from "./deliveryPerson/deliveryPerson.module";
     TypeOrmModule.forRoot({
       type: "postgres",
       host: process.env.POSTGRES_HOST || "localhost",
-      port: parseInt(process.env.POSTGRES_PORT || "5434", 10),
-      database: process.env.POSTGRES_DB || "delivery-zona",
+      port: parseInt(process.env.POSTGRES_PORT || "5433", 10),
+      database: process.env.POSTGRES_DB || "deliveryzona",
       username: process.env.POSTGRES_USER || "postgres",
       password: process.env.POSTGRES_PASSWORD || "postgres",
       // Por seguridad, allow toggle de synchronize desde env (usar "false" en CI/producción si se usan migraciones)
